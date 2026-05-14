@@ -1,8 +1,12 @@
+'use client'
+import { useTheme } from '@/hooks/useTheme'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Topbar } from '@/components/layout/Topbar'
 import { AnimatedBackground } from '@/components/background/AnimatedBackground'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  useTheme()
+
   return (
     <div className="min-h-screen">
       <AnimatedBackground />

@@ -6,7 +6,7 @@ import { motion } from 'framer-motion'
 import { cn } from '@/utils/cn'
 
 export function ThemeSwitcher() {
-  const { activeTheme, setTheme } = useTheme()
+  const { activeTheme, setActiveTheme } = useTheme()
 
   return (
     <div className="flex items-center gap-2 px-4 pb-4">
@@ -15,7 +15,7 @@ export function ThemeSwitcher() {
           <motion.button
             whileHover={{ scale: 1.2 }}
             whileTap={{ scale: 0.9 }}
-            onClick={() => setTheme(key)}
+            onClick={() => setActiveTheme(key)}
             className={cn(
               'w-5 h-5 rounded-full border-2 transition-all duration-200 cursor-pointer',
               activeTheme === key

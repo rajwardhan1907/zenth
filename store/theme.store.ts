@@ -1,18 +1,15 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
 import { defaultTheme } from '@/config/themes'
 
 type ThemeStore = {
   activeTheme: string
-  setTheme: (theme: string) => void
+  setActiveTheme: (name: string) => void
 }
 
-export const useThemeStore = create<ThemeStore>()(
-  persist(
-    (set) => ({
-      activeTheme: defaultTheme,
-      setTheme: (theme) => set({ activeTheme: theme }),
-    }),
-    { name: 'zenth-theme' }
-  )
-)
+export const useThemeStore = create<ThemeStore>()((set) => ({
+  activeTheme: defaultTheme,
+  setActiveTheme: (name) => {
+    localStorage.setItem('zenth_theme', name)
+    set({ activeTheme: name })
+  },
+}))

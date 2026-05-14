@@ -4,8 +4,16 @@ import { useThemeStore } from '@/store/theme.store'
 import { themes } from '@/config/themes'
 
 export function useTheme() {
-  const { activeTheme, setTheme } = useThemeStore()
+  const { activeTheme, setActiveTheme } = useThemeStore()
   const token = themes[activeTheme] ?? themes['indigo']
+
+  // Rehydrate from localStorage on mount (store resets to default on fresh load)
+  useEffect(() => {
+    const saved = localStorage.getItem('zenth_theme')
+    if (saved && themes[saved]) {
+      setActiveTheme(saved)
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const root = document.documentElement
@@ -20,7 +28,7 @@ export function useTheme() {
     root.style.setProperty('--orb3', token.orb3)
     root.style.setProperty('--grid-color', token.gridColor)
     root.style.setProperty('--logo-color', token.logoColor)
-  }, [token])
+  }, [activeTheme])
 
-  return { activeTheme, setTheme, token }
+  return { activeTheme, setActiveTheme, token }
 }
