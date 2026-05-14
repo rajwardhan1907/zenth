@@ -6,7 +6,8 @@ function resolveUserName(): string {
     const raw = localStorage.getItem('zenth_onboarding')
     if (!raw) return 'there'
     const data = JSON.parse(raw)
-    return (typeof data?.firstName === 'string' && data.firstName.trim()) ? data.firstName.trim() : 'there'
+    const name = typeof data?.firstName === 'string' ? data.firstName.trim() : ''
+    return name || 'there'
   } catch {
     return 'there'
   }
