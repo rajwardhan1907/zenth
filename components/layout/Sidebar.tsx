@@ -11,6 +11,7 @@ import { ThemeSwitcher } from '@/components/theme/ThemeSwitcher'
 import { Badge } from '@/components/ui/Badge'
 import { cn } from '@/utils/cn'
 import { copy } from '@/config/copy'
+import { useApprovals } from '@/hooks/useApprovals'
 
 const iconMap: Record<string, React.ReactNode> = {
   LayoutDashboard: <LayoutDashboard size={17} />,
@@ -26,6 +27,7 @@ const iconMap: Record<string, React.ReactNode> = {
 
 export function Sidebar() {
   const pathname = usePathname()
+  const { totalPending } = useApprovals()
 
   const addRipple = (e: React.MouseEvent<HTMLAnchorElement>) => {
     const el = e.currentTarget
@@ -74,7 +76,22 @@ export function Sidebar() {
                 {iconMap[item.icon]}
               </span>
               <span>{item.label}</span>
-              {item.badge && (
+              {item.href === '/dashboard/content' ? (
+                totalPending > 0 && (
+                  <span
+                    className="ml-auto flex items-center justify-center text-white font-medium"
+                    style={{
+                      width: '16px',
+                      height: '16px',
+                      borderRadius: '50%',
+                      background: 'var(--accent)',
+                      fontSize: '10px',
+                    }}
+                  >
+                    {totalPending}
+                  </span>
+                )
+              ) : item.badge && (
                 <Badge variant="accent" className="ml-auto text-[10px] px-1.5 py-0">
                   {item.badge}
                 </Badge>

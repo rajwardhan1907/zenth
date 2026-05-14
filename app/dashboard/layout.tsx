@@ -3,6 +3,7 @@ import { useTheme } from '@/hooks/useTheme'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Topbar } from '@/components/layout/Topbar'
 import { AnimatedBackground } from '@/components/background/AnimatedBackground'
+import { Toaster } from 'sonner'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   useTheme()
@@ -17,6 +18,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {children}
         </div>
       </main>
+      <Toaster position="bottom-right" />
     </div>
   )
 }
