@@ -1,22 +1,22 @@
-export type PricingFeature = {
+type _LegacyPricingFeature = {
   label: string
   included: boolean
 }
 
-export type PricingTier = {
+type _LegacyPricingTier = {
   id: string
   name: string
   price: number
   currency: string
   period: string
   description: string
-  features: PricingFeature[]
+  features: _LegacyPricingFeature[]
   cta: string
   highlighted: boolean
   badge?: string
 }
 
-export const pricingTiers: PricingTier[] = [
+export const pricingTiers: _LegacyPricingTier[] = [
   {
     id: 'starter',
     name: 'Starter',
@@ -76,6 +76,88 @@ export const pricingTiers: PricingTier[] = [
       { label: 'Backlink tracking', included: true },
       { label: 'Geo targeting', included: true },
       { label: 'Priority support', included: true },
+    ],
+  },
+]
+
+export type PricingFeature = {
+  text: string
+  included: boolean
+}
+
+export type PricingTier = {
+  id: string
+  name: string
+  price: number
+  sites: string
+  featured: boolean
+  cta: string
+  features: PricingFeature[]
+}
+
+export const PRICING_TIERS: PricingTier[] = [
+  {
+    id: 'starter',
+    name: 'Starter',
+    price: 1499,
+    sites: '1 website',
+    featured: false,
+    cta: 'Get started →',
+    features: [
+      { text: 'Keyword research', included: true },
+      { text: '4 articles/month', included: true },
+      { text: 'Rank tracking', included: true },
+      { text: 'Site health audit', included: true },
+      { text: 'WhatsApp alerts', included: false },
+      { text: 'Agency features', included: false },
+    ],
+  },
+  {
+    id: 'growth',
+    name: 'Growth',
+    price: 4999,
+    sites: '3 websites',
+    featured: true,
+    cta: 'Start Growth plan →',
+    features: [
+      { text: 'Everything in Starter', included: true },
+      { text: '16 articles/month', included: true },
+      { text: 'Competitor gap analysis', included: true },
+      { text: 'WhatsApp approvals', included: true },
+      { text: 'Google Analytics 4', included: true },
+      { text: 'Agency features', included: false },
+    ],
+  },
+  {
+    id: 'scale',
+    name: 'Scale',
+    price: 12999,
+    sites: '10 websites',
+    featured: false,
+    cta: 'Get Scale plan →',
+    features: [
+      { text: 'Everything in Growth', included: true },
+      { text: 'Unlimited articles', included: true },
+      { text: 'Priority agent runs', included: true },
+      { text: 'CMS auto-publish', included: true },
+      { text: 'GEO optimisation', included: true },
+      { text: 'White-label', included: false },
+    ],
+  },
+  {
+    id: 'agency',
+    name: 'Agency',
+    price: 29999,
+    sites: 'Unlimited sites',
+    featured: false,
+    cta: 'Talk to us →',
+    features: [
+      { text: 'Everything in Scale', included: true },
+      { text: 'White-label reports', included: true },
+      { text: 'Client portals', included: true },
+      { text: 'Agency dashboard', included: true },
+      { text: 'REST API access', included: true },
+      { text: 'Priority support', included: true },
     ],
   },
 ]
