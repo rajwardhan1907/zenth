@@ -37,6 +37,7 @@ export function Button({
   children,
   loading,
   disabled,
+  onClick,
   ...props
 }: ButtonProps) {
   const btnRef = useRef<HTMLButtonElement>(null)
@@ -57,7 +58,7 @@ export function Button({
       btn.querySelector('.ripple-circle')?.remove()
       btn.appendChild(circle)
     }
-    props.onClick?.(e)
+    onClick?.(e)
   }
 
   return (

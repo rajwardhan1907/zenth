@@ -14,7 +14,7 @@ export function useOnboarding() {
   const isLast = currentStep === onboardingSteps.length - 1
 
   const next = () => {
-    if (!isLast) setCurrentStep((s) => s + 1)
+    setCurrentStep((s) => Math.min(s + 1, onboardingSteps.length - 1))
   }
 
   const back = () => {
