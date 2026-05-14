@@ -1,29 +1,35 @@
 'use client'
 import { useState, useMemo } from 'react'
 import { mockKeywords } from '@/mock/keywords.mock'
-import { KeywordIntent, KeywordStatus } from '@/types/keyword'
+import type { KeywordIntent } from '@/types/keyword'
 
 export function useKeywords() {
-  const [search, setSearch] = useState('')
-  const [filterIntent, setFilterIntent] = useState<KeywordIntent | 'all'>('all')
-  const [filterStatus, setFilterStatus] = useState<KeywordStatus | 'all'>('all')
-  const [clusterView, setClusterView] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [intentFilter, setIntentFilter] = useState<KeywordIntent | 'all'>('all')
+  const [difficultyRange, setDifficultyRange] = useState<[number, number]>([0, 100])
 
-  const filtered = useMemo(() => {
+  const filteredKeywords = useMemo(() => {
     return mockKeywords.filter((k) => {
-      const matchSearch = k.keyword.toLowerCase().includes(search.toLowerCase())
-      const matchIntent = filterIntent === 'all' || k.intent === filterIntent
-      const matchStatus = filterStatus === 'all' || k.status === filterStatus
-      return matchSearch && matchIntent && matchStatus
+      const matchSearch = k.keyword.toLowerCase().includes(searchQuery.toLowerCase())
+      const matchIntent = intentFilter === 'all' || k.intent === intentFilter
+      const matchDifficulty = k.difficulty >= difficultyRange[0] && k.difficulty <= difficultyRange[1]
+      return matchSearch && matchIntent && matchDifficulty
     })
-  }, [search, filterIntent, filterStatus])
+  }, [searchQuery, intentFilter, difficultyRange])
+
+  const clearFilters = () => {
+    setSearchQuery('')
+    setIntentFilter('all')
+    setDifficultyRange([0, 100])
+  }
 
   return {
-    keywords: filtered,
-    search, setSearch,
-    filterIntent, setFilterIntent,
-    filterStatus, setFilterStatus,
-    clusterView, setClusterView,
-    isLoading: false,
+    filteredKeywords,
+    searchQuery, setSearchQuery,
+    intentFilter, setIntentFilter,
+    difficultyRange, setDifficultyRange,
+    clearFilters,
+    totalCount: mockKeywords.length,
+    filteredCount: filteredKeywords.length,
   }
 }

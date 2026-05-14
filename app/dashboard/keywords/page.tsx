@@ -1,22 +1,21 @@
 'use client'
 import { PageWrapper } from '@/components/layout/PageWrapper'
-import { Input } from '@/components/ui/Input'
-import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
+import { Badge } from '@/components/ui/Badge'
 import { useKeywords } from '@/hooks/useKeywords'
 import { copy } from '@/config/copy'
 import { formatNumber } from '@/utils/formatNumber'
-import { Search, Layers } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { Search, X, FilterX } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/utils/cn'
-import type { KeywordIntent, KeywordStatus } from '@/types/keyword'
+import type { KeywordIntent, KeywordStatus, Keyword } from '@/types/keyword'
 
 // Mini sparkline using SVG
 function Sparkline({ data }: { data: number[] }) {
   const max = Math.max(...data)
   const min = Math.min(...data)
   const range = max - min || 1
-  const w = 60, h = 24
+  const w = 56, h = 22
   const pts = data.map((v, i) => {
     const x = (i / (data.length - 1)) * w
     const y = h - ((v - min) / range) * h
@@ -29,144 +28,219 @@ function Sparkline({ data }: { data: number[] }) {
   )
 }
 
-const intentVariant: Record<KeywordIntent, 'info' | 'accent' | 'success' | 'warning'> = {
-  informational: 'info',
-  commercial: 'accent',
-  transactional: 'success',
-  navigational: 'warning',
+function DifficultyPill({ value }: { value: number }) {
+  const config = value <= 33
+    ? { bg: 'rgba(34,197,94,0.1)', color: '#16a34a', label: 'Easy' }
+    : value <= 66
+    ? { bg: 'rgba(245,158,11,0.1)', color: '#d97706', label: 'Medium' }
+    : { bg: 'rgba(239,68,68,0.1)', color: '#dc2626', label: 'Hard' }
+  return (
+    <div className="flex items-center gap-1.5">
+      <span className="text-sm font-semibold tabular-nums" style={{ color: config.color }}>{value}</span>
+      <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full whitespace-nowrap" style={{ background: config.bg, color: config.color }}>
+        {config.label}
+      </span>
+    </div>
+  )
 }
 
-const statusVariant: Record<KeywordStatus, 'success' | 'accent' | 'default' | 'error'> = {
-  ranking: 'success',
-  opportunity: 'accent',
-  tracked: 'default',
-  declined: 'error',
+const intentColors: Record<KeywordIntent, { bg: string; color: string }> = {
+  informational: { bg: '#EDE9FE', color: '#5B21B6' },
+  commercial:    { bg: '#E0F2FE', color: '#0369A1' },
+  transactional: { bg: '#DCFCE7', color: '#166534' },
+  navigational:  { bg: '#FEF3C7', color: '#92400E' },
+}
+
+const statusColors: Record<KeywordStatus, { bg: string; color: string }> = {
+  opportunity: { bg: '#DCFCE7', color: '#166534' },
+  ranking:     { bg: '#EDE9FE', color: '#5B21B6' },
+  tracked:     { bg: '#E0F2FE', color: '#0369A1' },
+  declined:    { bg: '#FEF3C7', color: '#92400E' },
 }
 
 const intents: Array<KeywordIntent | 'all'> = ['all', 'informational', 'commercial', 'transactional', 'navigational']
-const statuses: Array<KeywordStatus | 'all'> = ['all', 'opportunity', 'ranking', 'tracked', 'declined']
 
 export default function KeywordsPage() {
   const {
-    keywords, search, setSearch,
-    filterIntent, setFilterIntent,
-    filterStatus, setFilterStatus,
-    clusterView, setClusterView,
+    filteredKeywords,
+    searchQuery, setSearchQuery,
+    intentFilter, setIntentFilter,
+    difficultyRange, setDifficultyRange,
+    clearFilters,
+    totalCount, filteredCount,
   } = useKeywords()
-
-  // Group by cluster if cluster view is on
-  const grouped = clusterView
-    ? keywords.reduce<Record<string, typeof keywords>>((acc, kw) => {
-        const key = kw.clusterName ?? 'Ungrouped'
-        ;(acc[key] = acc[key] ?? []).push(kw)
-        return acc
-      }, {})
-    : null
 
   return (
     <PageWrapper
       title={copy.keywords.pageTitle}
       subtitle={copy.keywords.pageSubtitle}
     >
-      {/* Filters */}
+      {/* Filter bar */}
       <div className="flex flex-wrap items-center gap-3">
-        <div className="w-72">
-          <Input
-            placeholder={copy.keywords.searchPlaceholder}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            icon={<Search size={14} />}
+
+        {/* Search input */}
+        <div className="relative" style={{ width: '260px' }}>
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)] pointer-events-none" />
+          <input
+            type="text"
+            placeholder="Search keywords..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-8 pr-8 py-2 text-sm rounded-xl border border-white/80 bg-white/60 text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-border)] transition-all"
           />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors"
+            >
+              <X size={13} />
+            </button>
+          )}
         </div>
 
-        {/* Intent filter */}
-        <div className="flex items-center gap-1 bg-white/60 rounded-xl p-1 border border-white/80">
-          {intents.map((i) => (
-            <button key={i}
-              onClick={() => setFilterIntent(i)}
-              className={cn('px-2.5 py-1 text-xs rounded-lg capitalize transition-all duration-150',
-                filterIntent === i ? 'bg-white shadow-sm text-[var(--text-primary)] font-semibold' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-              )}
-            >{i === 'all' ? 'All intent' : i}</button>
+        {/* Intent filter pills */}
+        <div className="flex items-center gap-1">
+          {intents.map((intent) => (
+            <button
+              key={intent}
+              onClick={() => setIntentFilter(intent)}
+              className="px-3 py-1.5 text-xs rounded-full capitalize transition-all duration-150 font-medium"
+              style={intentFilter === intent
+                ? { background: 'var(--accent)', color: 'white', border: '0.5px solid var(--accent)' }
+                : { background: 'transparent', color: 'var(--text-secondary)', border: '0.5px solid rgba(255,255,255,0.7)' }
+              }
+            >
+              {intent === 'all' ? 'All' : intent.charAt(0).toUpperCase() + intent.slice(1)}
+            </button>
           ))}
         </div>
 
-        {/* Status filter */}
-        <div className="flex items-center gap-1 bg-white/60 rounded-xl p-1 border border-white/80">
-          {statuses.map((s) => (
-            <button key={s}
-              onClick={() => setFilterStatus(s)}
-              className={cn('px-2.5 py-1 text-xs rounded-lg capitalize transition-all duration-150',
-                filterStatus === s ? 'bg-white shadow-sm text-[var(--text-primary)] font-semibold' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-              )}
-            >{s === 'all' ? 'All status' : s}</button>
-          ))}
+        {/* Difficulty range slider */}
+        <div className="flex items-center gap-2">
+          <span className="text-xs whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
+            Difficulty: {difficultyRange[0]} — {difficultyRange[1]}
+          </span>
+          <div className="flex items-center gap-1.5">
+            <input
+              type="range"
+              min={0}
+              max={100}
+              step={1}
+              value={difficultyRange[0]}
+              onChange={(e) => {
+                const val = Math.min(Number(e.target.value), difficultyRange[1] - 1)
+                setDifficultyRange([val, difficultyRange[1]])
+              }}
+              style={{ width: '90px', accentColor: 'var(--accent)' }}
+            />
+            <input
+              type="range"
+              min={0}
+              max={100}
+              step={1}
+              value={difficultyRange[1]}
+              onChange={(e) => {
+                const val = Math.max(Number(e.target.value), difficultyRange[0] + 1)
+                setDifficultyRange([difficultyRange[0], val])
+              }}
+              style={{ width: '90px', accentColor: 'var(--accent)' }}
+            />
+          </div>
         </div>
 
-        <Button
-          variant={clusterView ? 'primary' : 'secondary'}
-          size="sm"
-          onClick={() => setClusterView(!clusterView)}
-        >
-          <Layers size={13} />
-          {copy.keywords.clusterToggle}
-        </Button>
+        {/* Result count */}
+        <span className="ml-auto text-xs whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
+          Showing {filteredCount} of {totalCount} keywords
+        </span>
       </div>
 
       {/* Table */}
       <div className="glass rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.05)]">
         {/* Header */}
-        <div className="grid grid-cols-[2fr_80px_80px_120px_100px_80px] gap-4 px-4 py-3 text-[10px] uppercase tracking-widest font-semibold text-[var(--text-tertiary)] border-b border-white/60">
+        <div className="grid grid-cols-[2fr_90px_140px_130px_110px_60px] gap-4 px-4 py-3 text-[10px] uppercase tracking-widest font-semibold text-[var(--text-tertiary)] border-b border-white/60">
           <span>{copy.keywords.columns.keyword}</span>
           <span className="text-right">{copy.keywords.columns.volume}</span>
-          <span className="text-right">{copy.keywords.columns.difficulty}</span>
+          <span>{copy.keywords.columns.difficulty}</span>
           <span>{copy.keywords.columns.intent}</span>
-          <span>{copy.keywords.columns.status}</span>
+          <span>Status</span>
           <span>{copy.keywords.columns.trend}</span>
         </div>
 
-        {keywords.length === 0 ? (
-          <div className="py-16 text-center text-sm text-[var(--text-tertiary)]">{copy.keywords.emptyState}</div>
-        ) : grouped ? (
-          Object.entries(grouped).map(([cluster, kws]) => (
-            <div key={cluster}>
-              <div className="px-4 py-2 text-xs font-semibold uppercase tracking-widest text-[var(--accent)] bg-[var(--accent-bg)] border-b border-[var(--accent-border)]">
-                {cluster} · {kws.length} keywords
-              </div>
-              {kws.map((kw, i) => <KeywordRow key={kw.id} kw={kw} i={i} />)}
-            </div>
-          ))
+        {filteredKeywords.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <FilterX size={28} style={{ color: 'var(--text-secondary)' }} className="mb-3" />
+            <p className="font-medium mb-1" style={{ fontSize: '15px', color: 'var(--text-primary)' }}>
+              No keywords match your filters
+            </p>
+            <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+              Try adjusting the search or difficulty range
+            </p>
+            <button
+              onClick={clearFilters}
+              className="mt-3 text-[var(--accent)] hover:underline transition-all"
+              style={{ fontSize: '13px' }}
+            >
+              Clear filters
+            </button>
+          </div>
         ) : (
-          keywords.map((kw, i) => <KeywordRow key={kw.id} kw={kw} i={i} />)
+          <AnimatePresence initial={false}>
+            {filteredKeywords.map((kw, i) => (
+              <KeywordRow key={kw.id} kw={kw} i={i} intentColors={intentColors} statusColors={statusColors} isLast={i === filteredKeywords.length - 1} />
+            ))}
+          </AnimatePresence>
         )}
       </div>
-
-      <p className="text-xs text-[var(--text-tertiary)]">{keywords.length} keyword{keywords.length !== 1 ? 's' : ''} shown</p>
     </PageWrapper>
   )
 }
 
-function KeywordRow({ kw, i }: { kw: ReturnType<typeof useKeywords>['keywords'][0]; i: number }) {
+function KeywordRow({
+  kw, i, intentColors, statusColors, isLast,
+}: {
+  kw: Keyword
+  i: number
+  intentColors: Record<KeywordIntent, { bg: string; color: string }>
+  statusColors: Record<KeywordStatus, { bg: string; color: string }>
+  isLast: boolean
+}) {
+  const ic = intentColors[kw.intent]
+  const sc = statusColors[kw.status]
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ delay: i * 0.03 }}
-      whileHover={{ x: 2, backgroundColor: 'rgba(255,255,255,0.6)' }}
-      className="grid grid-cols-[2fr_80px_80px_120px_100px_80px] gap-4 items-center px-4 py-3 border-b border-white/40 last:border-b-0 transition-all duration-150 cursor-default"
+      exit={{ opacity: 0 }}
+      transition={{ delay: i * 0.02 }}
+      whileHover={{ backgroundColor: 'rgba(255,255,255,0.55)' }}
+      className={cn(
+        'grid grid-cols-[2fr_90px_140px_130px_110px_60px] gap-4 items-center px-4 py-3 transition-colors duration-150 cursor-default',
+        !isLast && 'border-b border-white/40'
+      )}
     >
       <div>
-        <p className="text-sm font-medium text-[var(--text-primary)]">{kw.keyword}</p>
+        <p className="text-sm font-medium text-[var(--text-primary)] leading-snug">{kw.keyword}</p>
         {kw.currentRank && (
           <p className="text-xs text-emerald-600 mt-0.5">Rank #{kw.currentRank}</p>
         )}
       </div>
-      <p className="text-sm text-right text-[var(--text-secondary)] font-medium">{formatNumber(kw.volume)}</p>
-      <p className={cn('text-sm text-right font-semibold',
-        kw.difficulty < 30 ? 'text-emerald-600' : kw.difficulty < 50 ? 'text-amber-600' : 'text-red-500'
-      )}>{kw.difficulty}</p>
-      <Badge variant={intentVariant[kw.intent]}>{kw.intent}</Badge>
-      <Badge variant={statusVariant[kw.status]}>{kw.status}</Badge>
+      <p className="text-sm text-right text-[var(--text-secondary)] font-medium tabular-nums">
+        {kw.volume.toLocaleString()}
+      </p>
+      <DifficultyPill value={kw.difficulty} />
+      <span
+        className="text-[11px] font-medium px-2 py-0.5 rounded-full capitalize w-fit"
+        style={{ background: ic.bg, color: ic.color }}
+      >
+        {kw.intent}
+      </span>
+      <span
+        className="text-[11px] font-medium px-2 py-0.5 rounded-full capitalize w-fit"
+        style={{ background: sc.bg, color: sc.color }}
+      >
+        {kw.status}
+      </span>
       <Sparkline data={kw.trend} />
     </motion.div>
   )
