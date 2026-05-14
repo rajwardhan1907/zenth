@@ -27,7 +27,9 @@ export function useOnboarding() {
 
   const launch = async () => {
     setIsLaunching(true)
-    localStorage.setItem('zenth_onboarding', JSON.stringify(formData))
+    try {
+      localStorage.setItem('zenth_onboarding', JSON.stringify(formData))
+    } catch (e) {}
     await new Promise((res) => setTimeout(res, 1200))
     router.push('/dashboard')
   }
@@ -38,11 +40,11 @@ export function useOnboarding() {
     step,
     isFirst,
     isLast,
+    isLaunching,
     next,
     back,
+    launch,
     formData,
     updateFormData,
-    launch,
-    isLaunching,
   }
 }

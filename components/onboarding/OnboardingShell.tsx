@@ -79,7 +79,7 @@ export function OnboardingShell() {
                 disabled={isLaunching}
                 loading={isLaunching}
               >
-                {isLaunching ? 'Launching...' : isLast ? 'Launch Agent →' : 'Continue →'}
+                {isLaunching ? 'Launching...' : isLast ? copy.onboarding.finishLabel : copy.onboarding.nextLabel}
               </Button>
             </div>
           </div>
