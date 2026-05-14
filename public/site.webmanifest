@@ -1,0 +1,16 @@
+{
+  "name": "Zenth",
+  "short_name": "Zenth",
+  "description": "Your autonomous SEO agent",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020709",
+  "theme_color": "#6366f1",
+  "icons": [
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

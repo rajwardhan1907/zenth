@@ -4,6 +4,10 @@ import { DM_Serif_Display } from 'next/font/google'
 import dynamic from 'next/dynamic'
 import './globals.css'
 import { ThemeProvider } from '@/components/theme/ThemeProvider'
+import { generatePageMetadata, SEO_CONFIG, viewport as rootViewport } from '@/config/seo'
+import type { Viewport } from 'next'
+
+export const viewport: Viewport = rootViewport
 
 const PromptPanel = dynamic(
   () => import('@/components/dev/PromptPanel'),
@@ -24,8 +28,24 @@ const dmSerifDisplay = DM_Serif_Display({
 })
 
 export const metadata: Metadata = {
-  title: 'Zenth — set it. it grows.',
-  description: 'Your autonomous SEO agent. Give it your product — it handles everything.',
+  ...generatePageMetadata({}),
+  manifest: '/site.webmanifest',
+  verification: { google: '' },
+}
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: SEO_CONFIG.siteName,
+  url: SEO_CONFIG.siteUrl,
+  description: SEO_CONFIG.description,
+  applicationCategory: 'BusinessApplication',
+  operatingSystem: 'Web',
+  offers: {
+    '@type': 'Offer',
+    priceCurrency: 'INR',
+    price: '1499',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -39,6 +59,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
         </ThemeProvider>
         {process.env.NODE_ENV === 'development' && <PromptPanel />}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
       </body>
     </html>
   )
