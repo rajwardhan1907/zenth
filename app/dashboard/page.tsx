@@ -18,7 +18,7 @@ export default function DashboardPage() {
           {timeBasedGreeting}, {userName} 👋
         </h1>
         <p className="text-sm text-[var(--text-secondary)] mt-0.5">
-          Here's what your agent has been up to.
+          Here&apos;s what your agent has been up to.
         </p>
       </div>
 

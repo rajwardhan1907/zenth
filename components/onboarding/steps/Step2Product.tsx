@@ -11,7 +11,7 @@ export function Step2Product({ onUpdate }: StepProps) {
   return (
     <div>
       <h2 className="text-xl font-bold text-[var(--text-primary)] mb-1">Describe your product</h2>
-      <p className="text-sm text-[var(--text-secondary)] mb-6">The more context you give, the smarter the agent's keyword and content strategy will be.</p>
+      <p className="text-sm text-[var(--text-secondary)] mb-6">The more context you give, the smarter the agent&apos;s keyword and content strategy will be.</p>
       <div className="flex flex-col gap-4">
         <Input label="Product / Company name" placeholder="e.g. ClearTax" onChange={(e) => onUpdate({ productName: e.target.value })} />
         <Textarea

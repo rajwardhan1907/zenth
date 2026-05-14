@@ -33,7 +33,7 @@ export default function LoginPage() {
             <Button className="w-full mt-1">Sign in</Button>
           </div>
           <p className="text-xs text-center text-[var(--text-secondary)] mt-4">
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Link href="/onboarding" className="font-semibold" style={{ color: 'var(--accent)' }}>Start free</Link>
           </p>
         </div>

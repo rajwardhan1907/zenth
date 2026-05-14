@@ -8,7 +8,7 @@ export function Step1Account({ onUpdate }: StepProps) {
   return (
     <div>
       <h2 className="text-xl font-bold text-[var(--text-primary)] mb-1">Create your account</h2>
-      <p className="text-sm text-[var(--text-secondary)] mb-6">Tell us who you are so the agent knows whose site it's working on.</p>
+      <p className="text-sm text-[var(--text-secondary)] mb-6">Tell us who you are so the agent knows whose site it&apos;s working on.</p>
       <div className="flex flex-col gap-4">
         <div className="flex gap-3">
           <Input label="First name" placeholder="Rahul" onChange={(e) => onUpdate({ firstName: e.target.value })} />
