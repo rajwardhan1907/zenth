@@ -274,7 +274,7 @@ export default function SettingsPage() {
               onChange={(v) => setProfile((p) => ({ ...p, company: v }))}
               placeholder="MyStore"
             />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-[14px]">
               <SelectField
                 label="Timezone"
                 value={profile.timezone}
@@ -369,13 +369,8 @@ export default function SettingsPage() {
           {integrations.map((intg, i) => (
             <div
               key={intg.key}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '12px 0',
-                borderBottom: i < integrations.length - 1 ? '0.5px solid rgba(255,255,255,0.4)' : undefined,
-              }}
+              className="flex flex-col sm:flex-row sm:items-center gap-3 py-3"
+              style={{ borderBottom: i < integrations.length - 1 ? '0.5px solid rgba(255,255,255,0.4)' : undefined }}
             >
               <span style={{ color: 'var(--text-secondary)', flexShrink: 0 }}>{intg.icon}</span>
               <div style={{ flex: 1, minWidth: 0 }}>
@@ -384,6 +379,7 @@ export default function SettingsPage() {
               </div>
               <button
                 onClick={() => console.log(`connect ${intg.key}`)}
+                className="self-start sm:self-auto"
                 style={{
                   fontSize: '12px',
                   padding: '5px 14px',
@@ -434,7 +430,7 @@ export default function SettingsPage() {
         {/* ── 6. Billing ── */}
         <Section title={copy.settings.sections.billing} icon={<CreditCard size={16} />}>
           {/* Current plan */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
             <div>
               <p style={{ fontSize: '18px', fontWeight: 500, color: 'var(--accent)' }}>{growthPlan.name}</p>
               <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginTop: '2px' }}>
@@ -458,7 +454,7 @@ export default function SettingsPage() {
           </div>
 
           {/* Usage meters */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
             {usageMeters.map((meter) => {
               const pct = meter.used / meter.limit
               const fillColor = pct >= 1

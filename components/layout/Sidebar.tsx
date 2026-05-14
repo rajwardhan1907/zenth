@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   LayoutDashboard, FileText, Search, Activity, Link2,
   Globe, BarChart2, BookOpen, Settings, Zap,
@@ -25,7 +25,12 @@ const iconMap: Record<string, React.ReactNode> = {
   Settings: <Settings size={17} />,
 }
 
-export function Sidebar() {
+interface SidebarProps {
+  isOpen: boolean
+  onClose: () => void
+}
+
+export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname()
   const { totalPending } = useApprovals()
 
@@ -41,73 +46,96 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="glass-sidebar fixed left-0 top-0 h-screen w-60 flex flex-col z-40">
-      {/* Logo */}
-      <div className="flex items-center gap-2.5 px-5 py-5 border-b border-white/40">
-        <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'var(--accent)' }}>
-          <Zap size={16} className="text-white" />
+    <>
+      {/* Mobile overlay */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            className="fixed inset-0 bg-black/40 z-40 md:hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={onClose}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Sidebar */}
+      <aside
+        className={cn(
+          'glass-sidebar fixed left-0 top-0 h-screen w-60 flex flex-col z-50',
+          'transition-transform duration-[250ms] ease-in-out',
+          isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        )}
+      >
+        {/* Logo */}
+        <div className="flex items-center gap-2.5 px-5 py-5 border-b border-white/40">
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'var(--accent)' }}>
+            <Zap size={16} className="text-white" />
+          </div>
+          <span className="font-bold text-lg tracking-tight" style={{ color: 'var(--logo-color)' }}>
+            {copy.app.name}
+          </span>
         </div>
-        <span className="font-bold text-lg tracking-tight" style={{ color: 'var(--logo-color)' }}>
-          {copy.app.name}
-        </span>
-      </div>
 
-      {/* Nav */}
-      <nav className="flex-1 overflow-y-auto py-3 px-2.5">
-        {navItems.map((item) => {
-          const isActive =
-            pathname === item.href ||
-            (item.href !== '/dashboard' && pathname.startsWith(item.href))
+        {/* Nav */}
+        <nav className="flex-1 overflow-y-auto py-3 px-2.5">
+          {navItems.map((item) => {
+            const isActive =
+              pathname === item.href ||
+              (item.href !== '/dashboard' && pathname.startsWith(item.href))
 
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={addRipple}
-              className={cn(
-                'ripple-wrapper relative flex items-center gap-2.5 px-3 py-2.5 rounded-xl mb-0.5 text-sm font-medium transition-all duration-200',
-                isActive
-                  ? 'nav-active-bar text-[var(--accent)]'
-                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:translate-x-0.5'
-              )}
-              style={isActive ? { background: 'var(--accent-bg)' } : undefined}
-            >
-              <span className={cn(isActive ? 'text-[var(--accent)]' : 'text-[var(--text-tertiary)]')}>
-                {iconMap[item.icon]}
-              </span>
-              <span>{item.label}</span>
-              {item.href === '/dashboard/content' ? (
-                totalPending > 0 && (
-                  <span
-                    className="ml-auto flex items-center justify-center text-white font-medium"
-                    style={{
-                      width: '16px',
-                      height: '16px',
-                      borderRadius: '50%',
-                      background: 'var(--accent)',
-                      fontSize: '10px',
-                    }}
-                  >
-                    {totalPending}
-                  </span>
-                )
-              ) : item.badge && (
-                <Badge variant="accent" className="ml-auto text-[10px] px-1.5 py-0">
-                  {item.badge}
-                </Badge>
-              )}
-            </Link>
-          )
-        })}
-      </nav>
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={(e) => { addRipple(e); onClose() }}
+                className={cn(
+                  'ripple-wrapper relative flex items-center gap-2.5 px-3 py-2.5 rounded-xl mb-0.5 text-sm font-medium transition-all duration-200',
+                  isActive
+                    ? 'nav-active-bar text-[var(--accent)]'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:translate-x-0.5'
+                )}
+                style={isActive ? { background: 'var(--accent-bg)' } : undefined}
+              >
+                <span className={cn(isActive ? 'text-[var(--accent)]' : 'text-[var(--text-tertiary)]')}>
+                  {iconMap[item.icon]}
+                </span>
+                <span>{item.label}</span>
+                {item.href === '/dashboard/content' ? (
+                  totalPending > 0 && (
+                    <span
+                      className="ml-auto flex items-center justify-center text-white font-medium"
+                      style={{
+                        width: '16px',
+                        height: '16px',
+                        borderRadius: '50%',
+                        background: 'var(--accent)',
+                        fontSize: '10px',
+                      }}
+                    >
+                      {totalPending}
+                    </span>
+                  )
+                ) : item.badge && (
+                  <Badge variant="accent" className="ml-auto text-[10px] px-1.5 py-0">
+                    {item.badge}
+                  </Badge>
+                )}
+              </Link>
+            )
+          })}
+        </nav>
 
-      {/* Bottom: theme switcher */}
-      <div className="border-t border-white/40 pt-3">
-        <p className="px-4 pb-2 text-[10px] uppercase tracking-widest text-[var(--text-tertiary)] font-semibold">
-          Appearance
-        </p>
-        <ThemeSwitcher />
-      </div>
-    </aside>
+        {/* Bottom: theme switcher */}
+        <div className="border-t border-white/40 pt-3">
+          <p className="px-4 pb-2 text-[10px] uppercase tracking-widest text-[var(--text-tertiary)] font-semibold">
+            Appearance
+          </p>
+          <ThemeSwitcher />
+        </div>
+      </aside>
+    </>
   )
 }

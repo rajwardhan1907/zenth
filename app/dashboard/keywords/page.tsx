@@ -76,10 +76,10 @@ export default function KeywordsPage() {
       subtitle={copy.keywords.pageSubtitle}
     >
       {/* Filter bar */}
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3">
 
         {/* Search input */}
-        <div className="relative" style={{ width: '260px' }}>
+        <div className="relative w-full sm:w-64">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)] pointer-events-none" />
           <input
             type="text"
@@ -99,7 +99,7 @@ export default function KeywordsPage() {
         </div>
 
         {/* Intent filter pills */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 flex-wrap">
           {intents.map((intent) => (
             <button
               key={intent}
@@ -131,7 +131,7 @@ export default function KeywordsPage() {
                 const val = Math.min(Number(e.target.value), difficultyRange[1] - 1)
                 setDifficultyRange([val, difficultyRange[1]])
               }}
-              style={{ width: '90px', accentColor: 'var(--accent)' }}
+              style={{ width: '80px', accentColor: 'var(--accent)' }}
             />
             <input
               type="range"
@@ -143,19 +143,20 @@ export default function KeywordsPage() {
                 const val = Math.max(Number(e.target.value), difficultyRange[0] + 1)
                 setDifficultyRange([difficultyRange[0], val])
               }}
-              style={{ width: '90px', accentColor: 'var(--accent)' }}
+              style={{ width: '80px', accentColor: 'var(--accent)' }}
             />
           </div>
         </div>
 
         {/* Result count */}
-        <span className="ml-auto text-xs whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
+        <span className="sm:ml-auto text-xs whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
           Showing {filteredCount} of {totalCount} keywords
         </span>
       </div>
 
-      {/* Table */}
-      <div className="glass rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.05)]">
+      {/* Table — horizontally scrollable on mobile */}
+      <div className="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0">
+      <div className="glass rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.05)] min-w-[600px]">
         {/* Header */}
         <div className="grid grid-cols-[2fr_90px_140px_130px_110px_60px] gap-4 px-4 py-3 text-[10px] uppercase tracking-widest font-semibold text-[var(--text-tertiary)] border-b border-white/60">
           <span>{copy.keywords.columns.keyword}</span>
@@ -190,6 +191,7 @@ export default function KeywordsPage() {
             ))}
           </AnimatePresence>
         )}
+      </div>
       </div>
     </PageWrapper>
   )

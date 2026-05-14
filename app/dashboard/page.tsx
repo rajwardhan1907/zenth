@@ -14,7 +14,7 @@ export default function DashboardPage() {
     <PageWrapper>
       {/* Greeting */}
       <div>
-        <h1 className="text-2xl font-bold text-[var(--text-primary)]">
+        <h1 className="text-xl md:text-2xl font-bold text-[var(--text-primary)]">
           {timeBasedGreeting}, {userName} 👋
         </h1>
         <p className="text-sm text-[var(--text-secondary)] mt-0.5">
@@ -26,15 +26,15 @@ export default function DashboardPage() {
       <ApprovalBanner count={3} />
 
       {/* Metric cards */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {metrics.map((m, i) => (
           <MetricCard key={m.id} metric={m} index={i} />
         ))}
       </div>
 
       {/* Charts + Feed */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
-        <div className="xl:col-span-2">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="md:col-span-2">
           <TrafficChart data={trafficData} />
         </div>
         <AgentFeed events={agentFeed} />

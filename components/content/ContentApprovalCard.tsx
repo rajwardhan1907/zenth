@@ -69,15 +69,17 @@ export function ContentApprovalCard({
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-2 mt-4">
-          <Button size="sm" onClick={onApprove}>{copy.content.approveLabel}</Button>
-          {!isEditing && (
-            <Button size="sm" variant="secondary" onClick={onEditOpen}>{copy.content.editLabel}</Button>
-          )}
-          <Button size="sm" variant="ghost" onClick={onSkip}>{copy.content.skipLabel}</Button>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 mt-4">
+          <div className="flex items-center gap-2">
+            <Button size="sm" onClick={onApprove}>{copy.content.approveLabel}</Button>
+            {!isEditing && (
+              <Button size="sm" variant="secondary" onClick={onEditOpen}>{copy.content.editLabel}</Button>
+            )}
+            <Button size="sm" variant="ghost" onClick={onSkip}>{copy.content.skipLabel}</Button>
+          </div>
           <button
             onClick={() => setExpanded((v) => !v)}
-            className="ml-auto flex items-center gap-1 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+            className="sm:ml-auto flex items-center gap-1 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
           >
             {expanded ? copy.content.collapseLabel : copy.content.expandLabel}
             {expanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
