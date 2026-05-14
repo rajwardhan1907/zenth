@@ -1,7 +1,13 @@
 import type { Metadata } from 'next'
 import localFont from 'next/font/local'
+import dynamic from 'next/dynamic'
 import './globals.css'
 import { ThemeProvider } from '@/components/theme/ThemeProvider'
+
+const PromptPanel = dynamic(
+  () => import('@/components/dev/PromptPanel'),
+  { ssr: false }
+)
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -21,6 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider>
           {children}
         </ThemeProvider>
+        {process.env.NODE_ENV === 'development' && <PromptPanel />}
       </body>
     </html>
   )
