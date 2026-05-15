@@ -4,6 +4,7 @@ import { DM_Serif_Display } from 'next/font/google'
 import dynamic from 'next/dynamic'
 import './globals.css'
 import { ThemeProvider } from '@/components/theme/ThemeProvider'
+import { QueryProvider } from '@/components/providers/QueryProvider'
 import { generatePageMetadata, SEO_CONFIG, viewport as rootViewport } from '@/config/seo'
 import type { Viewport } from 'next'
 
@@ -55,9 +56,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
       </head>
       <body className={`${geistSans.variable} ${dmSerifDisplay.variable} antialiased`}>
-        <ThemeProvider>
-          {children}
-        </ThemeProvider>
+        <QueryProvider>
+          <ThemeProvider>
+            {children}
+          </ThemeProvider>
+        </QueryProvider>
         {process.env.NODE_ENV === 'development' && <PromptPanel />}
         <script
           type="application/ld+json"

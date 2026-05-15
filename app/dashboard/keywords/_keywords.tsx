@@ -60,6 +60,26 @@ const statusColors: Record<KeywordStatus, { bg: string; color: string }> = {
 
 const intents: Array<KeywordIntent | 'all'> = ['all', 'informational', 'commercial', 'transactional', 'navigational']
 
+function KeywordRowSkeleton({ isLast }: { isLast: boolean }) {
+  return (
+    <div
+      className={cn(
+        'grid grid-cols-[2fr_90px_140px_130px_110px_60px] gap-4 items-center px-4 py-3',
+        !isLast && 'border-b border-white/40'
+      )}
+    >
+      <div className="h-3.5 w-44 rounded-full bg-white/60 animate-pulse" />
+      <div className="h-3.5 w-12 rounded-full bg-white/60 animate-pulse ml-auto" />
+      <div className="h-3.5 w-20 rounded-full bg-white/60 animate-pulse" />
+      <div className="h-5 w-24 rounded-full bg-white/60 animate-pulse" />
+      <div className="h-5 w-20 rounded-full bg-white/60 animate-pulse" />
+      <div className="h-5 w-14 rounded-full bg-white/60 animate-pulse" />
+    </div>
+  )
+}
+
+const SKELETON_COUNT = 8
+
 export default function KeywordsPage() {
   const {
     filteredKeywords,
@@ -68,6 +88,7 @@ export default function KeywordsPage() {
     difficultyRange, setDifficultyRange,
     clearFilters,
     totalCount, filteredCount,
+    isLoading, isError,
   } = useKeywords()
 
   return (
@@ -150,7 +171,7 @@ export default function KeywordsPage() {
 
         {/* Result count */}
         <span className="sm:ml-auto text-xs whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
-          Showing {filteredCount} of {totalCount} keywords
+          {isLoading ? 'Loading keywords…' : `Showing ${filteredCount} of ${totalCount} keywords`}
         </span>
       </div>
 
@@ -167,7 +188,20 @@ export default function KeywordsPage() {
           <span>{copy.keywords.columns.trend}</span>
         </div>
 
-        {filteredKeywords.length === 0 ? (
+        {isLoading ? (
+          Array.from({ length: SKELETON_COUNT }).map((_, i) => (
+            <KeywordRowSkeleton key={i} isLast={i === SKELETON_COUNT - 1} />
+          ))
+        ) : isError ? (
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <p className="font-medium mb-1" style={{ fontSize: '15px', color: 'var(--text-primary)' }}>
+              Failed to load keywords
+            </p>
+            <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+              Check your DataForSEO credentials or try again later
+            </p>
+          </div>
+        ) : filteredKeywords.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <FilterX size={28} style={{ color: 'var(--text-secondary)' }} className="mb-3" />
             <p className="font-medium mb-1" style={{ fontSize: '15px', color: 'var(--text-primary)' }}>
